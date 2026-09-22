@@ -1,0 +1,36 @@
+{
+  "manifestVersion": 1,
+  "templateId": "replace-with-template-id",
+  "version": "1.0",
+  "miniVersion": "0.0.0",
+  "sdkApiVersion": "1",
+  "title": "Starter List",
+  "title_zh": "起步清单",
+  "description": "A responsive offline list for building a custom MiniPage.",
+  "description_zh": "用于构建自定义迷你页面的响应式离线清单。",
+  "cover": "assets/cover.png",
+  "entry": "index.html",
+  "defaultLocale": "en",
+  "locales": {
+    "en": "locales/en.json",
+    "zh": "locales/zh.json"
+  },
+  "network": { "endpoints": [] },
+  "dataSchema": {
+    "preferences": {
+      "type": "json",
+      "default": { "compact": false }
+    },
+    "records": {
+      "type": "collection",
+      "version": 1,
+      "fields": [
+        { "key": "title", "type": "text", "required": true },
+        { "key": "details", "type": "text" },
+        { "key": "done", "type": "boolean", "default": false },
+        { "key": "photos", "type": "attachment", "default": [] }
+      ]
+    }
+  },
+  "files": []
+}

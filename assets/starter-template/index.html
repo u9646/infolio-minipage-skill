@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title></title>
+    <link rel="stylesheet" href="app.css" />
+    <script src="i18n.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow" data-i18n="eyebrow"></p>
+          <h1 data-i18n="heading"></h1>
+          <p class="intro" data-i18n="intro"></p>
+        </div>
+        <button id="density-toggle" class="quiet-button" type="button"></button>
+      </header>
+
+      <div id="status" class="status" role="status" aria-live="polite" hidden>
+        <span id="status-message"></span>
+        <button id="retry" class="text-button" type="button" hidden></button>
+      </div>
+
+      <div id="workspace" class="workspace" hidden>
+        <section class="composer" aria-labelledby="form-title">
+          <h2 id="form-title" data-i18n="newItem"></h2>
+          <form id="item-form">
+            <label for="title" data-i18n="titleLabel"></label>
+            <input id="title" name="title" maxlength="120" required />
+            <label for="details" data-i18n="detailsLabel"></label>
+            <textarea id="details" name="details" rows="4"></textarea>
+            <div id="photo-list" class="photo-list"></div>
+            <div class="form-actions">
+              <button id="pick-images" class="quiet-button" type="button" data-i18n="addPhotos"></button>
+              <button id="cancel-edit" class="text-button" type="button" data-i18n="cancel" hidden></button>
+              <button id="save" class="primary-button" type="submit" data-i18n="save"></button>
+            </div>
+          </form>
+        </section>
+
+        <section class="collection" aria-labelledby="list-title">
+          <div class="section-heading">
+            <h2 id="list-title" data-i18n="items"></h2>
+            <span id="count" class="meta"></span>
+          </div>
+          <div id="records" class="record-list"></div>
+          <div id="empty" class="empty" hidden>
+            <h3 data-i18n="emptyTitle"></h3>
+            <p data-i18n="emptyText"></p>
+          </div>
+          <button id="load-more" class="quiet-button load-more" type="button" data-i18n="loadMore" hidden></button>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

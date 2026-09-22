@@ -1,0 +1,129 @@
+<svg width="1280" height="800" viewBox="0 0 1280 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>使用 Skill 定制自己的 MiniPage</title>
+  <desc>infolio MiniPage Skill 封面，展示代码、模块化页面和多端自适应预览。</desc>
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="18" stdDeviation="28" flood-color="#163D38" flood-opacity="0.13"/>
+    </filter>
+    <filter id="soft-shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#163D38" flood-opacity="0.10"/>
+    </filter>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" stroke="#C8D8D4" stroke-opacity="0.34"/>
+    </pattern>
+  </defs>
+
+  <rect width="1280" height="800" fill="#F3F7F5"/>
+  <rect width="1280" height="800" fill="url(#grid)"/>
+  <path d="M0 670C182 600 334 626 470 694C585 751 718 782 896 742C1032 711 1141 659 1280 674V800H0V670Z" fill="#DDF1EB"/>
+  <circle cx="1148" cy="112" r="126" fill="#FFE7C5"/>
+  <circle cx="1168" cy="92" r="60" fill="#F6B65F" fill-opacity="0.46"/>
+
+  <g transform="translate(72 68)">
+    <rect width="72" height="72" rx="20" fill="white" filter="url(#soft-shadow)"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M17 11C11 11 7 15 7 22L8 54C8 61 14 66 21 65L55 64C62 64 66 58 65 51L64 20C64 14 59 10 52 11L17 11ZM32 30C32 36 29 40 24 40C19 41 15 37 15 32C15 26 18 22 23 22C28 22 32 25 32 30ZM40 30C40 36 43 40 48 40C53 41 57 37 57 32C57 26 54 22 49 22C44 22 40 25 40 30ZM36 36L40 41L36 49L32 41L36 36Z" fill="#06C5A9"/>
+    <text x="92" y="30" fill="#24433E" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="700">infolio</text>
+    <text x="92" y="54" fill="#6A7A76" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="15" font-weight="600">MiniPage Skill</text>
+  </g>
+
+  <g transform="translate(72 216)">
+    <rect width="102" height="30" rx="8" fill="#D9F2EC"/>
+    <text x="51" y="20" text-anchor="middle" fill="#087B6C" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" font-weight="750" letter-spacing="1.5">SKILL → UI</text>
+    <text x="0" y="102" fill="#193B35" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="54" font-weight="760" letter-spacing="-2">用 Skill 定制</text>
+    <text x="0" y="166" fill="#193B35" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="54" font-weight="760" letter-spacing="-2">你自己的 MiniPage</text>
+    <text x="2" y="218" fill="#6A7A76" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif" font-size="18">从想法到离线运行的响应式页面</text>
+
+    <g transform="translate(0 272)" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" font-weight="650">
+      <rect width="76" height="38" rx="10" fill="white" stroke="#D7E3DF"/>
+      <text x="38" y="24" text-anchor="middle" fill="#34554F">HTML</text>
+      <rect x="88" width="66" height="38" rx="10" fill="white" stroke="#D7E3DF"/>
+      <text x="121" y="24" text-anchor="middle" fill="#34554F">CSS</text>
+      <rect x="166" width="52" height="38" rx="10" fill="white" stroke="#D7E3DF"/>
+      <text x="192" y="24" text-anchor="middle" fill="#34554F">JS</text>
+    </g>
+
+    <g transform="translate(0 360)">
+      <circle cx="7" cy="7" r="7" fill="#06C5A9"/>
+      <path d="M4 7.2 6.2 9.4 10.4 4.8" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="25" y="12" fill="#526A65" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif" font-size="15">本地 SDK · 无外部网络</text>
+      <circle cx="7" cy="43" r="7" fill="#2F6BEA"/>
+      <path d="M4 43.2 6.2 45.4 10.4 40.8" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="25" y="48" fill="#526A65" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif" font-size="15">手机 · 平板 · 桌面自适应</text>
+    </g>
+  </g>
+
+  <g transform="translate(590 108)" filter="url(#shadow)">
+    <rect width="618" height="550" rx="28" fill="#FFFFFF"/>
+    <rect x="1" y="1" width="616" height="548" rx="27" stroke="#D7E3DF"/>
+    <rect x="0" y="0" width="618" height="58" rx="28" fill="#F9FBFA"/>
+    <path d="M0 58H618" stroke="#E3EAE7"/>
+    <circle cx="28" cy="29" r="6" fill="#FF827A"/>
+    <circle cx="48" cy="29" r="6" fill="#F6BD61"/>
+    <circle cx="68" cy="29" r="6" fill="#06C5A9"/>
+    <rect x="219" y="18" width="180" height="22" rx="7" fill="#EDEFEF"/>
+    <rect x="232" y="26" width="88" height="6" rx="3" fill="#BCC8C5"/>
+
+    <g transform="translate(22 82)">
+      <rect width="206" height="438" rx="16" fill="#183C37"/>
+      <rect x="18" y="20" width="70" height="8" rx="4" fill="#7BDACB"/>
+      <rect x="18" y="42" width="128" height="6" rx="3" fill="#486B66"/>
+      <g transform="translate(18 82)">
+        <rect width="170" height="112" rx="12" fill="#214A44"/>
+        <text x="14" y="25" fill="#AEE9DF" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11">dataSchema</text>
+        <rect x="14" y="40" width="92" height="6" rx="3" fill="#62C9B9"/>
+        <rect x="26" y="57" width="118" height="6" rx="3" fill="#789893"/>
+        <rect x="26" y="74" width="84" height="6" rx="3" fill="#789893"/>
+        <rect x="14" y="91" width="104" height="6" rx="3" fill="#62C9B9"/>
+      </g>
+      <g transform="translate(18 214)">
+        <rect width="170" height="132" rx="12" fill="#214A44"/>
+        <text x="14" y="25" fill="#AEE9DF" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11">window.infolio</text>
+        <rect x="14" y="43" width="126" height="6" rx="3" fill="#789893"/>
+        <rect x="14" y="61" width="142" height="6" rx="3" fill="#789893"/>
+        <rect x="14" y="79" width="108" height="6" rx="3" fill="#789893"/>
+        <rect x="14" y="97" width="132" height="6" rx="3" fill="#789893"/>
+      </g>
+      <rect x="18" y="374" width="106" height="32" rx="9" fill="#06C5A9"/>
+      <text x="71" y="395" text-anchor="middle" fill="#123A34" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" font-weight="750">BUILD</text>
+    </g>
+
+    <g transform="translate(250 82)">
+      <rect width="344" height="438" rx="16" fill="#F6F8F7" stroke="#E0E7E4"/>
+      <rect x="22" y="22" width="42" height="42" rx="12" fill="#D9F2EC"/>
+      <path d="M33 34h20v20H39c-3.3 0-6-2.7-6-6V34Zm8 0v8h12v3H41v9h-3V34h3Z" fill="#079884"/>
+      <rect x="78" y="26" width="128" height="10" rx="5" fill="#24433E"/>
+      <rect x="78" y="45" width="176" height="7" rx="3.5" fill="#A5B3AF"/>
+      <rect x="22" y="88" width="300" height="116" rx="14" fill="white" stroke="#DDE5E2"/>
+      <rect x="40" y="108" width="112" height="8" rx="4" fill="#294942"/>
+      <rect x="40" y="130" width="242" height="7" rx="3.5" fill="#B6C0BD"/>
+      <rect x="40" y="148" width="194" height="7" rx="3.5" fill="#CDD5D2"/>
+      <rect x="40" y="170" width="78" height="20" rx="6" fill="#E1F0FF"/>
+      <rect x="128" y="170" width="64" height="20" rx="6" fill="#DDF1EB"/>
+
+      <rect x="22" y="222" width="192" height="152" rx="14" fill="white" stroke="#DDE5E2"/>
+      <circle cx="48" cy="250" r="10" fill="#06C5A9"/>
+      <rect x="68" y="244" width="104" height="8" rx="4" fill="#294942"/>
+      <rect x="42" y="278" width="150" height="6" rx="3" fill="#BCC7C4"/>
+      <rect x="42" y="296" width="126" height="6" rx="3" fill="#D0D8D5"/>
+      <rect x="42" y="324" width="58" height="30" rx="8" fill="#2F6BEA"/>
+      <rect x="108" y="324" width="70" height="30" rx="8" fill="#EDF0EF"/>
+
+      <g transform="translate(232 224)" filter="url(#soft-shadow)">
+        <rect width="88" height="172" rx="18" fill="#1B3F39"/>
+        <rect x="6" y="7" width="76" height="158" rx="13" fill="white"/>
+        <rect x="18" y="24" width="40" height="6" rx="3" fill="#2E514A"/>
+        <rect x="18" y="43" width="52" height="34" rx="8" fill="#DDF1EB"/>
+        <rect x="18" y="86" width="52" height="34" rx="8" fill="#E9F1FF"/>
+        <rect x="18" y="132" width="36" height="18" rx="6" fill="#06C5A9"/>
+      </g>
+      <path d="M208 414H22" stroke="#D7E3DF" stroke-width="2" stroke-dasharray="5 7"/>
+      <text x="22" y="404" fill="#78908A" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11">RESPONSIVE PREVIEW</text>
+    </g>
+  </g>
+
+  <g transform="translate(76 728)">
+    <rect width="1128" height="1" fill="#BFD4CE"/>
+    <text x="0" y="34" fill="#6A7A76" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif" font-size="13">OFFLINE · RESPONSIVE · SDK-POWERED</text>
+    <text x="1128" y="34" text-anchor="end" fill="#34554F" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="13" font-weight="700">infolio</text>
+  </g>
+</svg>
