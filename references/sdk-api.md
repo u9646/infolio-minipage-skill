@@ -22,6 +22,8 @@
 
 ## 运行环境
 
+本技能生成的模板以 infolio `1.4.0` 为最低运行版本；新模板在 manifest 中显式设置 `miniVersion: "1.4.0"`，已有更高版本要求时不降低。模板需导入 app 运行，直接打开 HTML 不会获得宿主 SDK。
+
 宿主在模板脚本之前注入冻结的 `window.infolio`：
 
 ```ts
@@ -60,7 +62,7 @@ interface Window {
 
 页面自动绑定需要配套的 Native 和 Web 消息分发宿主一起交付。更新后的宿主兼容历史模板传入 `pageId`；新模板省略 `pageId` 不代表能兼容尚未更新的旧宿主。
 
-模板运行在 `sandbox="allow-scripts"` iframe 中。宿主 CSP 禁止网络连接、子 frame、Worker、object、外部表单和外部资源。只有当前加载的 `manifest.entry` 作为可执行文档入口并注入 SDK；其他资源作为文档打开时不允许执行脚本。页面导航仅允许宿主认可的活动入口（可带 query/hash）：可取得来源框架时限定同一加载，否则使用当前 WebView 控制器的活动入口允许列表。模板界面切换使用自身入口的单页内部状态或 hash 路由，不依赖跨入口导航。包内图片、SVG、样式、字体和媒体仍按资源加载。
+模板运行在 `sandbox="allow-scripts"` iframe 中。宿主 CSP 禁止直接接口连接、子 frame、Worker、object、外部表单和非图片外部资源；有效入口文档允许加载 HTTPS 图片，无需 `network.endpoints` 声明。模板显式选择图片 URL、使用 `no-referrer` 并提供失败占位，旧宿主可能不支持此能力。只有当前加载的 `manifest.entry` 作为可执行文档入口并注入 SDK；其他资源作为文档打开时不允许执行脚本。页面导航仅允许宿主认可的活动入口（可带 query/hash）：可取得来源框架时限定同一加载，否则使用当前 WebView 控制器的活动入口允许列表。模板界面切换使用自身入口的单页内部状态或 hash 路由，不依赖跨入口导航。包内图片、SVG、样式、字体和媒体仍按资源加载。
 
 `connectors` 是 SDK `1` 的增量能力；旧宿主可能没有该模块，调用前检查 `window.infolio.connectors`。它通过 Native 调用已配置连接，不开放 iframe 直接联网或读取凭据。
 
@@ -246,7 +248,7 @@ const env = await window.infolio.env.get()
 无参数，返回 `MinipageEnv`。
 
 - `pageId`：当前页面实例 ID，仅供只读识别；数据与媒体调用由宿主自动绑定当前页面，不将它传回 SDK。
-- `manifest`：当前运行包的完整 manifest；可包含 `miniVersion`（如 `1.3.1`），供客户端决定模板列表是否展示，旧包缺省按 `0.0.0`。
+- `manifest`：当前运行包的完整 manifest；可包含 `miniVersion`（新模板默认 `1.4.0`），供客户端决定模板列表是否展示，旧包缺省按 `0.0.0`。
 - `language`：infolio 当前语言，如 `zh`、`en-US`。使用完整语言标签、语言主标签、`manifest.defaultLocale` 的顺序选择翻译。
 - `theme`：当前主题。把它写到根节点的 `data-theme`，由 CSS token 响应。
 - `timezone`：IANA 时区，如 `Asia/Shanghai`。日期时间显示传给 `Intl.DateTimeFormat`。

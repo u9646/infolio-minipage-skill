@@ -4,6 +4,7 @@
 import argparse
 import datetime as dt
 from html.parser import HTMLParser
+from html import unescape
 import hashlib
 import ipaddress
 import json
@@ -48,6 +49,9 @@ JS_IMPORT = re.compile(
     r"(?m)(?:\bimport\s+(?:[^'\"]+?\s+from\s+)?|\bexport\s+[^'\"]+?\s+from\s+|\bimport\s*\()(['\"])([^'\"]+)\1"
 )
 SVG_REFERENCE = re.compile(r"(?i)\b(?:href|xlink:href)\s*=\s*(['\"])([^'\"]+)\1")
+HTML_ATTRIBUTE = re.compile(
+    r'''(?P<name>[\w:-]+)\s*=\s*(?:"(?P<double>[^"]*)"|'(?P<single>[^']*)'|(?P<bare>[^\s>]+))'''
+)
 FORBIDDEN_JS = {
     "fetch": re.compile(r"\bfetch\s*\("),
     "XMLHttpRequest": re.compile(r"\bXMLHttpRequest\b"),
@@ -69,7 +73,7 @@ FORBIDDEN_JS = {
 
 
 class TemplateHTMLParser(HTMLParser):
-    def __init__(self):
+    def __init__(self, source=""):
         super().__init__(convert_charrefs=True)
         self.doctype = False
         self.charset = False
@@ -79,6 +83,9 @@ class TemplateHTMLParser(HTMLParser):
         self.labels = set()
         self.controls = []
         self.images = []
+        self.picture_depth = 0
+        self.image_url_ranges = []
+        self.line_offsets = [0, *(match.end() for match in re.finditer("\n", source))]
 
     def handle_decl(self, decl):
         if decl.lower() == "doctype html":
@@ -87,6 +94,25 @@ class TemplateHTMLParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
         values = dict(attrs)
         lower = tag.lower()
+        if lower == "picture":
+            self.picture_depth += 1
+        image_attributes = ({"src", "srcset"} if lower == "img" else
+                            {"srcset"} if lower == "source" and self.picture_depth else set())
+        if image_attributes:
+            line, column = self.getpos()
+            start = self.line_offsets[line - 1] + column
+            for match in HTML_ATTRIBUTE.finditer(self.get_starttag_text()):
+                attribute = match.group("name").lower()
+                if attribute not in image_attributes:
+                    continue
+                group = next(key for key in ("double", "single", "bare")
+                             if match.group(key) is not None)
+                value = unescape(match.group(group))
+                candidates = srcset_references(value) if attribute == "srcset" else [value]
+                if (any(is_https_image_reference(candidate) for candidate in candidates) and
+                        all(is_https_image_reference(candidate) or is_local_reference(candidate)
+                            for candidate in candidates)):
+                    self.image_url_ranges.append((start + match.start(group), start + match.end(group)))
         if lower == "meta":
             if values.get("charset", "").lower() == "utf-8":
                 self.charset = True
@@ -95,13 +121,11 @@ class TemplateHTMLParser(HTMLParser):
                 self.viewport = "width=device-width" in content
         for attribute in ("src", "href", "poster"):
             if values.get(attribute):
-                self.resources.append((lower, attribute, values[attribute]))
-        for value in values.get("srcset", "").split(","):
-            candidate = value.strip().split()[0] if value.strip() else ""
-            if candidate:
-                self.resources.append((lower, "srcset", candidate))
+                self.resources.append((lower, attribute, values[attribute], attribute in image_attributes))
+        for candidate in srcset_references(values.get("srcset", "")):
+            self.resources.append((lower, "srcset", candidate, "srcset" in image_attributes))
         if lower == "form" and values.get("action"):
-            self.resources.append((lower, "action", values["action"]))
+            self.resources.append((lower, "action", values["action"], False))
         if lower == "label" and values.get("for"):
             self.labels.add(values["for"])
         if lower in {"button", "input", "textarea", "select"}:
@@ -112,6 +136,10 @@ class TemplateHTMLParser(HTMLParser):
             self.errors.append(f"Forbidden HTML element: <{lower}>")
         if any(name.lower().startswith("on") for name, _ in attrs):
             self.errors.append(f"Inline event handler is not allowed on <{lower}>")
+
+    def handle_endtag(self, tag):
+        if tag.lower() == "picture":
+            self.picture_depth = max(0, self.picture_depth - 1)
 
 
 def decode_text(raw, name):
@@ -128,6 +156,48 @@ def is_local_reference(value):
     if NETWORK_URL.match(cleaned) or cleaned.startswith(("mailto:", "tel:", "javascript:", "/")):
         return False
     return True
+
+
+def srcset_references(value):
+    # Commas can be part of image URLs (CDN transformations and data URLs).
+    # A candidate's URL ends at ASCII whitespace; descriptors end at a comma.
+    whitespace = " \t\n\r\f"
+    references = []
+    position = 0
+    while position < len(value):
+        while position < len(value) and value[position] in whitespace + ",":
+            position += 1
+        start = position
+        while position < len(value) and value[position] not in whitespace:
+            position += 1
+        url = value[start:position]
+        if not url:
+            break
+        references.append(url.rstrip(","))
+        if url.endswith(","):
+            continue
+        parentheses = 0
+        while position < len(value):
+            character = value[position]
+            position += 1
+            if character == "(":
+                parentheses += 1
+            elif character == ")":
+                parentheses = max(0, parentheses - 1)
+            elif character == "," and parentheses == 0:
+                break
+    return references
+
+
+def is_https_image_reference(value):
+    try:
+        parsed = urlsplit(value.strip())
+        return (parsed.scheme == "https" and bool(parsed.hostname) and
+                not parsed.username and not parsed.password and
+                not any(ord(character) < 32 for character in value) and
+                "\\" not in value and (parsed.port is None or 0 < parsed.port <= 65535))
+    except ValueError:
+        return False
 
 
 def validate_resource_reference(owner, value, files, label):
@@ -156,7 +226,7 @@ def resolve_reference(owner, value):
 
 def validate_html(name, raw, files):
     source = decode_text(raw, name)
-    parser = TemplateHTMLParser()
+    parser = TemplateHTMLParser(source)
     parser.feed(source)
     require(parser.doctype, f"{name}: missing <!doctype html>")
     require(parser.charset, f"{name}: missing <meta charset=\"UTF-8\">")
@@ -175,7 +245,9 @@ def validate_html(name, raw, files):
             require(accessible, f"{name}: <{tag}> needs a label or ARIA name")
     for attributes in parser.images:
         require("alt" in attributes, f"{name}: every image needs an alt attribute")
-    for tag, attribute, value in parser.resources:
+    for tag, attribute, value, is_image in parser.resources:
+        if is_image and is_https_image_reference(value):
+            continue
         validate_resource_reference(name, value, files, f"{tag} {attribute}")
 
 
@@ -185,6 +257,13 @@ def validate_runtime_sources(files, entry):
             continue
         source = decode_text(raw, name)
         network_source = source
+        if Path(name).suffix.lower() in {".html", ".htm"}:
+            parser = TemplateHTMLParser(source)
+            parser.feed(source)
+            # Exempt only parsed HTTPS image attributes, not matching URLs in
+            # scripts, styles, navigation, or other attributes of the same tag.
+            for start, end in reversed(parser.image_url_ranges):
+                network_source = network_source[:start] + " " * (end - start) + network_source[end:]
         if Path(name).suffix.lower() == ".svg":
             network_source = network_source.replace("http://www.w3.org/2000/svg", "")
             network_source = network_source.replace("http://www.w3.org/1999/xlink", "")

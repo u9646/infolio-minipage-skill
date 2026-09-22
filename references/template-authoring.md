@@ -40,7 +40,7 @@ template/
 | `manifestVersion` | 整数 `1` |
 | `templateId` | 稳定、非空、全局唯一的模板 ID；模板升级时不改变 |
 | `version` | 两段数字版本，从 `1.0` 开始，后续按 `2.0`、`3.0` 递增；两段按数值比较，不允许前导零、第三段、预发布或构建后缀 |
-| `miniVersion` | 最低 infolio App 版本，使用三段无前导零的数字，如 `1.3.1`；客户端版本达到或超过该值才在模板列表展示。旧包缺省按 `0.0.0`，新模板显式填写；每段不超过 `9007199254740991` |
+| `miniVersion` | 最低 infolio App 版本，使用三段无前导零的数字；新模板显式填写 `1.4.0`，需要更高版本的能力时相应提高，不降低已有模板的最低版本要求。客户端版本达到或超过该值才在模板列表展示。旧包缺省按 `0.0.0`；每段不超过 `9007199254740991` |
 | `sdkApiVersion` | 字符串 `"1"` |
 | `title`、`description` | 非空英文基础值，也是翻译最终回退 |
 | `title_<locale>`、`description_<locale>` | 可选的本地化展示字段，语言标签中的 `-` 写成 `_` |
@@ -92,7 +92,7 @@ template/
 - 所有用户数据使用 `textContent`、DOM 属性或安全节点构建；不使用 `innerHTML`。
 - 写入时锁定相关控件；成功后使用 SDK 返回值更新 UI，失败时保留草稿。
 - 连接器由 `infolio.connectors` 调用当前账号已配置的连接；先检测模块存在。连接选择、参数表单、结果展示及 write/delete 确认由模板设计，宿主不额外弹确认。`call()` 不要求先调用 `list()` 或 `describe()`，动态表单可使用 `describe()` 返回的 Schema。
-- 同类连接器可有多个连接，用 `connectionId` 定位，不用名称或 `connectorKey` 代替。保留并禁用 `invalid` 连接，展示恢复提示；空列表与请求失败分别处理。连接器结果是外部不可信数据，继续使用安全 DOM 构建，不自动加载其中的资源 URL。
+- 同类连接器可有多个连接，用 `connectionId` 定位，不用名称或 `connectorKey` 代替。保留并禁用 `invalid` 连接，展示恢复提示；空列表与请求失败分别处理。连接器结果是外部不可信数据，继续使用安全 DOM 构建。可显式选择业务图片字段，验证为 HTTPS 后赋给图片元素，不自动加载其他资源 URL。
 - 连接器调用不自动重试。`MCP_WRITE_OUTCOME_UNKNOWN` 表示请求可能已经执行，不能提示为确定失败或复用 collection 的 `mutationId` 重发；保留输入并让用户先核对外部状态。
 - collection 首屏使用页面 query 返回的 20 条记录和 `_pagination`；加载更多显式沿用 cursor、limit、筛选和排序。
 - 不假设新字段始终存在；读取旧页面时提供不写回的 UI 默认值。
@@ -124,16 +124,16 @@ template/
 
 完整 URL 只写入 manifest，脚本以 endpoint ID 和相对 path 调用。
 具体示例与错误契约见 [network.request](sdk-api.md#networkrequest)。starter 使用空列表，
-不会发起外网请求。需要网络的模板填入实际接口并将 `miniVersion` 设为首次交付配套
-Native/Web 宿主的 app 版本；该发布版本号由 app 发布时确定，不以模板版本代替。
+不会发起外网请求。需要网络的模板填入实际接口，`miniVersion` 至少为 `1.4.0`，
+对应配套 Native/Web 宿主的最低 app 版本，不以模板版本代替。
 调用前仍必须同时检测 capability 和 SDK 方法，不能只依赖最低版本字段。
 
 ## 离线与安全边界
 
-模板不得直接发起外部网络访问。已配置连接器的远程请求通过 `infolio.connectors`，manifest 声明的 HTTPS 接口通过 `infolio.network.request()` 交给 Native 执行；这类功能需要网络，必须显示真实的加载与失败状态，不能宣称离线也能取得新结果。禁止：
+模板的接口请求通过 `infolio.connectors`，或通过 `infolio.network.request()` 请求 manifest 声明的 HTTPS 接口，由 Native 执行。有效入口文档也允许浏览器直接加载 HTTPS 图片；这不需要 `network.endpoints` 声明，也不放开其他网络能力。联网功能须显示真实的加载与失败状态，不能宣称离线能取得新结果。禁止：
 
-- HTTP/HTTPS 和 `//host` 资源 URL。
-- CDN、远程字体、远程图片、远程模块、analytics。
+- HTTP 和 `//host` 图片 URL，以及非图片用途的外部资源 URL。
+- 外部脚本、样式、字体、模块、视频及 analytics。
 - fetch、XMLHttpRequest、WebSocket、EventSource、sendBeacon。
 - RTCPeerConnection、Worker、SharedWorker、Service Worker、importScripts。
 - iframe、object、embed、外部 form action 和外部跳转。
@@ -141,7 +141,9 @@ Native/Web 宿主的 app 版本；该发布版本号由 app 发布时确定，�
 
 模板以 `manifest.entry` 为唯一可执行文档入口，界面切换使用单页内部状态或同一入口的 hash 路由；不要跳转到包内其他 HTML、SVG 或 XHTML 文档。包内 SVG 仍可作为图片正常引用，其他本地静态资源和媒体按原方式加载。
 
-脚本、样式、字体、图片和图标全部随包提供。用户附件只能来自 `native.pickImages` 或 `native.pickMedia`，页面数据只通过 collection API 持久化；外部连接器的数据通过 connectors API 读取或修改，不会自动保存到页面。需要保留结果时，仅将必要业务字段写入已声明的数据成员，不保存凭据、鉴权 Header 或临时资源地址。媒体导出调用 `native.downloadAttachment`；不得用下载链接、外部请求或自建桥绕过宿主。
+脚本、样式、字体、界面图标和占位图片全部随包提供。HTTPS 业务图片可写在 HTML `img` 的 `src/srcset` 或 `picture` 内 `source` 的 `srcset`；也可在 JavaScript 中验证接口返回的 URL 后设置图片属性，不在脚本中硬编码完整远程 URL。远程图片使用 `referrerPolicy="no-referrer"`、懒加载和失败占位；不要为普通展示设置 `crossOrigin`，不要假设旧宿主支持或图片离线可用。CSS/SVG 资源引用仍须为包内资源。
+
+用户附件只能来自 `native.pickImages` 或 `native.pickMedia`，页面数据只通过 collection API 持久化；外部连接器的数据通过 connectors API 读取或修改，不会自动保存到页面。需要保留结果时，仅将必要业务字段写入已声明的数据成员，不保存凭据、鉴权 Header 或临时资源地址。媒体导出调用 `native.downloadAttachment`；不得用下载链接、外部请求或自建桥绕过宿主。
 
 URL 字段可以保存、显示、复制和搜索，但当前 SDK 没有对外开放的网页跳转方法。不要把 URL 渲染成看似可点击却无法工作的链接，也不要使用 anchor、`window.open` 或 location API 绕过这一限制；用户明确要求打开外链时，说明当前能力边界。
 

@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "templateId": "replace-with-template-id",
   "version": "1.0",
-  "miniVersion": "0.0.0",
+  "miniVersion": "1.4.0",
   "sdkApiVersion": "1",
   "title": "Starter List",
   "title_zh": "起步清单",
